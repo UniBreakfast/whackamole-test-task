@@ -1,0 +1,1 @@
+# whackamole-test-task
