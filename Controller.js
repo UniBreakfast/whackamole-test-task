@@ -1,39 +1,53 @@
 class Controller {
-  constructor(canvas) {
-    this.canvas = canvas.link;
-    this.context = this.canvas.getContext('2d');
+  constructor(canvas, score) {
+    this.canvas = canvas;
+    this.ctx = this.canvas.context;
     this.blocks = [];
-    this.timer = 0;
-    this.interval = 0;
+    this.next = 0;
+    this.score = score;
+    this.points = 0;
   }
 
-  createBlock() {
-    this.blocks.push(new Block(this));
-    this.timer = setTimeout(this.createBlock.bind(this), rnd(300,700));
+  createBlock(timestamp) {
+    this.blocks.push(new Block(this, timestamp));
   }
 
   start() {
-    this.interval = setInterval(this.animate.bind(this), 40);
-    this.createBlock();
+    this.score.innerText = this.points = 0;
+    requestAnimationFrame(this.animate.bind(this));
+
+    this.canvas.link.onmousedown = ({ x, y }) => {
+      const i = this.blocks.findIndex(block =>
+        x >= block.offset && x <= block.offset + block.size && y >= block.distance && y <= block.distance + block.size);
+      if (i >= 0) {
+        this.blocks.splice(i, 1);
+        this.canvas.link.style.cursor = "grabbing";
+        this.canvas.link.onmouseup = () => this.canvas.link.style.cursor = "default";
+        this.score.innerText = ++this.points
+      }
+    }
   }
 
   stop() {
-    clearInterval(this.interval);
-    clearTimeout(this.timer);
+    cancelAnimationFrame(this.frame);
+    this.blocks.length = 0;
+    this.canvas.clear();
   }
 
-  animate() {
-    this.context.clearRect(0, 0, this.canvas.clientWidth, this.canvas.clientWidth);
+  animate(timestamp) {
+    if (timestamp > this.next) {
+      this.createBlock(timestamp);
+      this.next = timestamp + rnd(300, 3000);
+    }
+    this.canvas.clear();
     this.blocks.forEach(block => {
-      this.context.fillStyle = block.color;
-      this.context.fillRect(block.offset, this.canvas.height - block.altitude, block.size, block.size);
-    });
-  
+      this.ctx.fillStyle = block.color;
+      block.distance = (timestamp - block.start) * this.canvas.height / block.time;
+      if (block.distance < this.canvas.height) this.ctx.fillRect(block.offset, block.distance, block.size, block.size);
 
-    requestAnimationFrame(this.animate.bind(this));
+    })
+    this.blocks = this.blocks.filter(block => block.end > timestamp)
+    this.frame = requestAnimationFrame(this.animate.bind(this));
   }
 }
 
-let controller = new Controller(_canvas);
-
-controller.start();
