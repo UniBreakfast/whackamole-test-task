@@ -6,8 +6,7 @@ class Block {
     this.distance = 0;
     this.controller = controller;
     this.start = timestamp;
-    this.time = rnd(1800, 3300);
-    // this.time = rnd(7500, 9500);
+    this.time = rnd(1500, 3100);
     this.end = timestamp + this.time;
   }
 }

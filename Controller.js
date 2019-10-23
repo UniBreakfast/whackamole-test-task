@@ -37,7 +37,7 @@ class Controller {
   animate(timestamp) {
     if (timestamp > this.next) {
       this.createBlock(timestamp);
-      this.next = timestamp + rnd(300, 3000);
+      this.next = timestamp + rnd(300, 1800);
     }
     this.canvas.clear();
     this.blocks.forEach(block => {
