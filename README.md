@@ -1,4 +1,4 @@
-# whackamole-test-task
+# [whackamole-test-task](https://github.com/UniBreakfast/whackamole-test-task)
 
 Написано с учеником на уроке.
 
